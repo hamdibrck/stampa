@@ -1,0 +1,30 @@
+node_modules/
+.DS_Store
+*.log
+
+# env
+.env
+.env.*
+!.env.example
+
+# expo / react native
+.expo/
+dist/
+web-build/
+apps/mobile/ios/
+apps/mobile/android/
+*.tsbuildinfo
+
+# data pipeline
+scripts/cities/.cache/
+scripts/cities/out/
+
+# supabase
+supabase/.branches/
+supabase/.temp/
+
+# coverage
+coverage/
+
+# stray nested repo (see docs/TODO-MANUAL.md)
+/stampa/
