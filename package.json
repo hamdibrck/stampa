@@ -12,7 +12,8 @@
     "test": "pnpm -r test",
     "test:db": "supabase test db",
     "mobile": "pnpm --filter @stampa/mobile",
-    "cities": "pnpm --filter @stampa/cities"
+    "cities": "pnpm --filter @stampa/cities",
+    "test:e2e": "node supabase/e2e/run.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
@@ -20,6 +21,7 @@
     "eslint-config-expo": "^58.0.4",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.9.10",
+    "supabase": "^3.1.0",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "vitest": "^5.1.0"

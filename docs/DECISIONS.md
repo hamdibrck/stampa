@@ -81,3 +81,43 @@ Format: **Karar / Neden / Alternatif**. Yeni kararlar sona eklenir.
 - **Karar:** iOS bundle identifier ve Android package `app.stampa.mobile` (ortam değişkeni `STAMPA_BUNDLE_ID` ile değiştirilebilir).
 - **Neden:** Store kayıtları henüz yok; build alınabilmesi için bir değer gerekli.
 - **Alternatif:** Kendi alan adına göre (ör. `com.<şirket>.stampa`) — store kaydı açılmadan önce karar verilmeli.
+
+## D17 — Harita üzerindeki yazılar yalnızca MapTiler anahtarıyla
+- **Karar:** Küme sayıları ve şehir adı etiketleri, `EXPO_PUBLIC_MAPTILER_KEY` tanımlıysa eklenir. Anahtar yokken kümeler boyutlarıyla ifade edilir, şehir adı dokununca mini kartta görünür.
+- **Neden:** MapLibre'de metin çizimi bir glyph (font) sunucusu gerektirir; yerel altlıkta (D1) böyle bir kaynak yok.
+- **Alternatif:** Glyph PBF dosyalarını uygulamaya gömmek — mümkün, ama paket boyutu ve `asset://` yol farkları nedeniyle v1'e alınmadı.
+
+## D18 — Wikipedia özetleri TextExtracts API ile
+- **Karar:** Özetler REST `page/summary` yerine Action API `prop=extracts&exintro` ile toplu çekilir; ilk 1–2 cümle `shortSummary` ile alınır (en fazla ~320 karakter, parantez içleri temizlenir). Wikipedia özeti yoksa Wikidata açıklaması, o da yoksa uygulamada "Ülke · Bölge · Nüfus".
+- **Neden:** Aynı metin kaynağı; istekler gruplanabiliyor ve sonuçlar diskte önbelleğe alınıyor.
+- **Alternatif:** Şehir başına iki REST isteği (~12 bin istek).
+
+## D19 — Wikidata eşlemesi GeoNames kimliği üzerinden
+- **Karar:** Şehir → Wikidata eşlemesi `P1566` (GeoNames ID) ile yapılır; birden çok aday varsa en çok site bağlantısı olan seçilir. Eşleşmeyen şehirler GeoNames adıyla ve yedek metinle kalır.
+- **Neden:** Ada göre eşleştirme yanlış şehir riskini taşır.
+- **Alternatif:** GeoNames `alternateNamesV2` dökümündeki Wikidata bağlantıları (≈200 MB indirme) — kapsama artırmak için ileride eklenebilir.
+
+## D20 — Fotoğraf kayıtları Storage tetikleyicileriyle
+- **Karar:** `public.photos` satırları istemci tarafından değil, `storage.objects` üzerindeki tetikleyicilerle oluşturulur/silinir. İstemci yalnızca `width`/`height` günceller.
+- **Neden:** Dosya ile kayıt her zaman bire bir kalır; yarıda kalan yüklemeler "görünmez" kota tüketmez.
+- **Alternatif:** İstemcinin satır eklemesi (D9'daki ilk tasarım) — tutarsızlığa açık.
+
+## D21 — Çıkışta yerel veri temizlenir
+- **Karar:** Çıkış yaparken önce bekleyen değişiklikler gönderilir, sonra cihazdaki damgalar silinir. Başka bir hesaba ait artık veri bulunursa senkrondan önce temizlenir.
+- **Neden:** Paylaşılan cihazda bir hesabın damgaları sonraki hesaba karışmamalı.
+- **Alternatif:** Veriyi misafir verisi olarak tutmak — hesaplar arası sızıntı riski.
+
+## D22 — Plus için `refresh-entitlements`
+- **Karar:** Satın alma ve geri yükleme sonrasında istemci, `refresh-entitlements` Edge Function'ını çağırır; fonksiyon RevenueCat REST API'sinden abonelik durumunu okuyup `entitlements` tablosunu günceller. Asıl kaynak yine webhook'tur.
+- **Neden:** Webhook gecikse ya da kaçsa bile kullanıcı ödediği hakkı hemen alır; "geri yükle" webhook üretmeyebilir.
+- **Alternatif:** Yalnızca webhook'a güvenmek.
+
+## D23 — Bottom sheet'ler native form sheet
+- **Karar:** Şehir detayı ve paywall, Expo Router rotaları olarak native `formSheet` sunumuyla açılır (köşe 28, tutamak, %64 ve tam boy). Ek bir bottom-sheet kütüphanesi kullanılmadı.
+- **Neden:** Platformun kendi jestleri ve erişilebilirliği; daha az bağımlılık.
+- **Alternatif:** `@gorhom/bottom-sheet`.
+
+## D24 — Şehir sayısı ve hariç tutulanlar
+- **Karar:** GeoNames'te `PPLX` (şehir bölümü/ilçe), `PPLH`, `PPLQ`, `PPLW` türleri şehir sayılmaz. Hiç şehri seçilmeyen ama aday listesinde yeri olan ülkeler için en büyük yerleşim eklenir.
+- **Neden:** Büyük şehirlerin ilçeleri ayrı "şehir" olarak paydayı şişirmesin; her ülkede en az bir damgalanabilir şehir olsun.
+- **Alternatif:** Tüm `P` sınıfı ≥100k yerleşimler (≈ 400 fazladan kayıt).

@@ -33,5 +33,6 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
-      - run: supabase db start
+      # Storage must run too: the photo quota lives in policies on storage.objects.
+      - run: supabase start -x studio,imgproxy,vector,logflare,supavisor,realtime,postgres-meta,edge-runtime
       - run: supabase test db

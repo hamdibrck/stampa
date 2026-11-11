@@ -181,102 +181,112 @@ flowchart TD
 
 ### M2 — Şehir veri hattı
 **Amaç:** Paydayı belirleyen şehir setini üretmek, uygulamaya gömmek, DB'ye seed etmek.
-- [ ] GeoNames indirme (cities15000, TR, countryInfo, admin1, alternateNames)
-- [ ] `rules.ts`: varsayılan ≥100k + başkent; TR = 81 il; override edilebilir
-- [ ] Wikidata açıklamaları + Wikipedia özetleri (cache'li, devam ettirilebilir)
-- [ ] Natural Earth 50m ülke geometrisi (sadeleştirilmiş)
-- [ ] Gömülü paket (`cities.v1.json`, `countries.v1.json`, `countries.geo.json`)
-- [ ] Supabase migration'ları (referans tabloları) + idempotent seed
-- [ ] Testler: TR = 81, kural override, idempotentlik
+- [x] GeoNames indirme (cities15000, TR, countryInfo, admin1, alternateNames)
+- [x] `rules.ts`: varsayılan ≥100k + başkent; TR = 81 il; override edilebilir
+- [x] Wikidata açıklamaları + Wikipedia özetleri (cache'li, devam ettirilebilir)
+- [x] Natural Earth 50m ülke geometrisi (sadeleştirilmiş)
+- [x] Gömülü paket (`cities.v1.json`, `countries.v1.json`, `countries.geo.json`)
+- [x] Supabase migration'ları (referans tabloları) + idempotent seed
+- [x] Testler: TR = 81, kural override, idempotentlik
 
-**Kabul:** Hat gerçek veriyle çalışıyor; TR tam 81; seed iki kez çalıştırılınca sonuç aynı.
+**Kabul:** Hat gerçek veriyle çalışıyor (5.916 şehir, 244 ülke); TR tam 81; hat ve seed iki kez çalıştırılınca sonuç aynı.
 **Riskler:** GeoNames'te eksik/yanlış PPLA kayıtları → test + elle düzeltme tablosu. Wikipedia hız sınırı → cache + düşük eşzamanlılık; özet yoksa yedek metin.
 
 ### M3 — Harita ve seçim
 **Amaç:** Haritada şehir bulup seçebilmek.
-- [ ] MapLibre haritası, yerel stil, ülke dolguları
-- [ ] Native cluster'lı şehir pinleri (ShapeSource), +/− zoom
-- [ ] Arama (aksan / Türkçe karakter duyarsız)
-- [ ] Mini kart + şehir sheet'i (yerel veri)
+- [x] MapLibre haritası, yerel stil, ülke dolguları
+- [x] Native cluster'lı şehir pinleri (ShapeSource), +/− zoom
+- [x] Arama (aksan / Türkçe karakter duyarsız)
+- [x] Mini kart + şehir sheet'i (yerel veri)
 
 **Kabul:** ~5–8 bin pin akıcı; "istanbul" → İstanbul, "sao paulo" → São Paulo; sonuca dokununca harita gidiyor ve kart açılıyor.
 **Riskler:** MapLibre RN API değişiklikleri → sürüm sabitleme; Expo Go'da çalışmaz → dev build.
 
 ### M4 — Ziyaretler ve sayaçlar
 **Amaç:** Damgalama ve tüm sayaçlar yerelde çalışsın.
-- [ ] MMKV kalıcı ziyaret store'u
-- [ ] Dünya sayacı, ülke sayaçları, "Ülkelerin" listesi
-- [ ] Ülke detay ekranı (halka grafik, filtreler)
-- [ ] Listem (ülkeye göre gruplu, tarihe göre sıralı)
-- [ ] Damga rozeti + animasyon + haptic
-- [ ] Türkçe sayı formatı
+- [x] MMKV kalıcı ziyaret store'u
+- [x] Dünya sayacı, ülke sayaçları, "Ülkelerin" listesi
+- [x] Ülke detay ekranı (halka grafik, filtreler)
+- [x] Listem (ülkeye göre gruplu, tarihe göre sıralı)
+- [x] Damga rozeti + animasyon + haptic
+- [x] Türkçe sayı formatı
 
 **Kabul:** Damgalayınca sayaçlar anında güncelleniyor; TR 81 üzerinden hesaplanıyor (test); uygulama yeniden açılınca veriler duruyor.
 **Riskler:** Her damgada tüm pin kaynağının yeniden üretilmesi → memoize + yalnızca `visited` kümesine bağlı ifade.
 
 ### M5 — Auth ve senkronizasyon
 **Amaç:** Hesap ve cihazlar arası veri.
-- [ ] Supabase client + oturum kalıcılığı
-- [ ] Apple, Google, magic link girişleri
-- [ ] Misafir verisini hesaba taşıma
-- [ ] Offline outbox + yeniden deneme
-- [ ] Kullanıcı tabloları migration'ı + pgTAP RLS testleri
+- [x] Supabase client + oturum kalıcılığı
+- [x] Apple, Google, magic link girişleri
+- [x] Misafir verisini hesaba taşıma
+- [x] Offline outbox + yeniden deneme
+- [x] Kullanıcı tabloları migration'ı + pgTAP RLS testleri
 
 **Kabul:** Uçak modunda damgalama → bağlantı gelince senkron; kullanıcı başkasının verisini okuyamıyor/yazamıyor (test).
 **Riskler:** Sağlayıcı yapılandırmaları hesap gerektirir → TODO-MANUAL; yerelde e-posta girişi ile doğrulama.
 
 ### M6 — Fotoğraflar
 **Amaç:** Şehir başına fotoğraf, kota sunucuda.
-- [ ] Seçme + sıkıştırma (uzun kenar 2048, kalite 0.8)
-- [ ] Yükleme, signed URL, `expo-image` cache, grid
-- [ ] `photo_quota` / `can_upload_photo` + Storage policy
-- [ ] pgTAP: 3. yükleme reddi
+- [x] Seçme + sıkıştırma (uzun kenar 2048, kalite 0.8)
+- [x] Yükleme, signed URL, `expo-image` cache, grid
+- [x] `photo_quota` / `can_upload_photo` + Storage policy
+- [x] pgTAP: 3. yükleme reddi
 
 **Kabul:** 3. fotoğraf denemesi paywall açıyor; istemci atlatılsa da sunucu reddediyor (test).
 **Riskler:** Eşzamanlı yüklemede yarış → advisory lock.
 
 ### M7 — IAP
 **Amaç:** Şehir paketi ve Plus satın alımı kotaya yansısın.
-- [ ] RevenueCat SDK, offering'lerden fiyat
-- [ ] Paywall sheet'i
-- [ ] `purchase_intents` + webhook Edge Function (idempotent)
-- [ ] Geri yükleme
-- [ ] Testler: webhook işleyici, entitlement → kota
+- [x] RevenueCat SDK, offering'lerden fiyat
+- [x] Paywall sheet'i
+- [x] `purchase_intents` + webhook Edge Function (idempotent)
+- [x] Geri yükleme
+- [x] Testler: webhook işleyici, entitlement → kota
 
 **Kabul:** Webhook olayı entitlement yazıyor ve kota artıyor (test). Sandbox satın alma: manuel doğrulama.
 **Riskler:** Şehir paketi ürün tipi (bkz. DECISIONS D7); webhook gecikmesi → satın alma sonrası kısa süreli yoklama.
 
 ### M8 — Topluluk istatistikleri
 **Amaç:** "Kullanıcıların %X'i gezdi".
-- [ ] `city_stats` / `country_stats` + `refresh_stats()`
-- [ ] pg_cron (15 dk)
-- [ ] k-anonim view'lar + pgTAP
-- [ ] Şehir sheet'i ve ülke detayına bağlama
+- [x] `city_stats` / `country_stats` + `refresh_stats()`
+- [x] pg_cron (15 dk)
+- [x] k-anonim view'lar + pgTAP
+- [x] Şehir sheet'i ve ülke detayına bağlama
 
 **Kabul:** Yüzde gerçek veriden; ziyaretçi < 20 ise "Yeni keşif" (test).
 **Riskler:** Az kullanıcıda her şey "Yeni keşif" görünür — beklenen davranış.
 
 ### M9 — Cila ve yayın hazırlığı
 **Amaç:** Mağazaya gönderilebilir duruma getirmek.
-- [ ] Hesap silme (Edge Function + UI)
-- [ ] Boş / hata / yükleniyor durumları
-- [ ] Erişilebilirlik turu
-- [ ] Uygulama ikonu + splash
-- [ ] EAS build profilleri
-- [ ] Store metinleri (tr/en) + gizlilik etiketleri taslağı
-- [ ] Hakkında ekranı (veri atıfları)
+- [x] Hesap silme (Edge Function + UI)
+- [x] Boş / hata / yükleniyor durumları
+- [x] Erişilebilirlik turu
+- [x] Uygulama ikonu + splash
+- [x] EAS build profilleri
+- [x] Store metinleri (tr/en) + gizlilik etiketleri taslağı
+- [x] Hakkında ekranı (veri atıfları)
 
 **Kabul:** §5'teki MVP kriterleri; yerelde doğrulanamayanlar açıkça işaretli.
 **Riskler:** Store incelemesi (hesap silme, restore, gizlilik) → taslaklar hazır.
 
 ## 5. MVP kabul kriterleri
 
-- [ ] Haritada şehre dokunup "Şehri gezdim" denebiliyor; sayaçlar anında güncelleniyor.
-- [ ] Türkiye sayacı 81 il üzerinden doğru (test).
-- [ ] Uçak modunda işaretleme; bağlantı gelince senkron.
-- [ ] 3. fotoğraf paywall açıyor; sunucu 3. yüklemeyi reddediyor (test).
-- [ ] Sandbox'ta Şehir paketi ve Plus alınabiliyor, geri yüklenebiliyor, kotaya yansıyor.
-- [ ] Topluluk yüzdesi gerçek veriden; k-anonimlik eşiğine uyuyor.
-- [ ] Hesap silme tüm veriyi ve fotoğrafları kaldırıyor.
-- [ ] `pnpm lint && pnpm typecheck && pnpm test` temiz; CI yeşil.
-- [ ] iOS ve Android için EAS development build alınabiliyor.
+İşaretli olanlar bu makinede doğrulandı. İşaretsiz olanların kodu hazır, ama doğrulaması hesap/cihaz gerektiriyor (bkz. `TODO-MANUAL.md`).
+
+- [x] "Şehri gezdim" ile damgalama; dünya ve ülke sayaçları anında güncelleniyor. — *Birim/bileşen testleri (store, `WorldCounter`). Simülatörde ana ekran çalışır durumda görüldü; dokunma etkileşimi simülatörde otomatik denenemedi.*
+- [x] Türkiye sayacı 81 il üzerinden doğru. — *Veri hattı, gömülü paket ve veritabanı testleri.*
+- [x] Uçak modunda işaretleme; bağlantı gelince senkron. — *Senkron motoru testleri (başarısız istek → kuyruk korunur → sonraki denemede gönderilir) + gerçek `sync_visits` RPC'si (pgTAP ve e2e). Cihazda uçak moduyla elle denenmedi.*
+- [x] 3. fotoğraf paywall açıyor; sunucu 3. yüklemeyi reddediyor. — *pgTAP + gerçek Storage API üzerinden e2e. Paywall'ın açılması istemci mantığı testiyle (`canAddPhoto`), ekranın kendisi elle denenmedi.*
+- [ ] Sandbox'ta Şehir paketi ve Plus alınabiliyor, geri yüklenebiliyor. — *Webhook → entitlement → kota zinciri pgTAP ve e2e ile doğrulandı; mağaza sandbox satın alması RevenueCat/App Store/Play hesapları gerektiriyor.*
+- [x] Topluluk yüzdesi gerçek veriden; k-anonimlik eşiğine uyuyor. — *pgTAP (20 ziyaretçi gösterilir, 19 gizlenir; ham sayılar API'ye kapalı).*
+- [x] Hesap silme tüm veriyi ve fotoğrafları kaldırıyor. — *Yerel stack üzerinde `delete-account` Edge Function'ı ile e2e.*
+- [ ] `pnpm lint && pnpm typecheck && pnpm test` temiz; CI yeşil. — *Yerelde temiz (124 birim testi + 97 pgTAP + 20 e2e). CI, push yapılmadığı için hiç çalışmadı.*
+- [ ] iOS ve Android için EAS development build. — *iOS simülatör build'i yerelde `xcodebuild` ile alındı ve uygulama açıldı. EAS build (hesap) ve Android (bu makinede JDK/SDK yok) denenmedi.*
+
+## 6. Bilinen sınırlar
+
+- Şehirlerin %88'i Wikidata ile eşleşti (5.187 / 5.916). Türkçe özet 3.091, İngilizce özet 4.766 şehirde var; kalanlar "Ülke · Bölge · Nüfus" yedek metnini gösterir. Eşleşmeyenlerde Türkçe ad yerine GeoNames adı kullanılır (D19).
+- Türkiye'de şehirler il adıyla gösterilir, özet metni ise il merkezinin Wikipedia maddesinden gelir (ör. Kocaeli kaydında İzmit özeti).
+- MapTiler anahtarı olmadan haritada yazı yok (D17).
+- Performans hedefleri (60 fps, 2 sn soğuk açılış) ölçülmedi; mimari bu hedeflere göre kuruldu (native cluster, gömülü veri, senkron MMKV).
+- `expo run:ios` bu makinede simülatör için de imzalama sertifikası istedi; simülatör build'i `xcodebuild` ile alındı.

@@ -37,3 +37,32 @@ export function formatPopulation(value: number, locale: Locale): string {
   }
   return String(value);
 }
+
+const MONTHS_EN = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+/** "2026-11-11" → tr "11.11.2026" / en "11 Nov 2026" */
+export function formatDate(isoDate: string, locale: Locale): string {
+  const [y, m, d] = isoDate.slice(0, 10).split('-');
+  if (!y || !m || !d) return isoDate;
+  if (locale === 'tr') return `${d}.${m}.${y}`;
+  return `${Number(d)} ${MONTHS_EN[Number(m) - 1] ?? m} ${y}`;
+}
+
+/** "TR" → 🇹🇷 (regional indicator symbols) */
+export function flagEmoji(iso2: string): string {
+  if (!/^[A-Z]{2}$/.test(iso2)) return '';
+  return String.fromCodePoint(...[...iso2].map((ch) => 0x1f1e6 + ch.charCodeAt(0) - 65));
+}

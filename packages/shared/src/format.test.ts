@@ -38,3 +38,16 @@ describe('ratio', () => {
     expect(ratio(5, 4)).toBe(1);
   });
 });
+
+describe('formatDate / flagEmoji', () => {
+  it('formats dates per locale', async () => {
+    const { formatDate } = await import('./format');
+    expect(formatDate('2026-11-11', 'tr')).toBe('11.11.2026');
+    expect(formatDate('2026-03-05', 'en')).toBe('5 Mar 2026');
+  });
+  it('builds flag emoji', async () => {
+    const { flagEmoji } = await import('./format');
+    expect(flagEmoji('TR')).toBe('🇹🇷');
+    expect(flagEmoji('x')).toBe('');
+  });
+});
