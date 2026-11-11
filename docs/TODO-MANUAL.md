@@ -14,3 +14,6 @@ Hesap, ödeme veya geri alınamaz işlem gerektirdiği için kodda yalnızca `.e
 
 ## Harita (opsiyonel)
 - [ ] MapTiler anahtarı → `EXPO_PUBLIC_MAPTILER_KEY`. Olmadan da harita çalışır (D1).
+
+## Uygulama kimliği
+- [ ] Bundle identifier / Android package'a karar ver (şu an `app.stampa.mobile`, bkz. D16). Store kaydı açıldıktan sonra değiştirilemez. `STAMPA_BUNDLE_ID` ortam değişkeni veya `apps/mobile/app.config.ts`.

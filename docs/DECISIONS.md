@@ -66,3 +66,18 @@ Format: **Karar / Neden / Alternatif**. Yeni kararlar sona eklenir.
 - **Karar:** Mobil: jest-expo + RNTL. `packages/shared` ve `scripts/cities`: Vitest. DB: pgTAP (`supabase test db`). Edge Function iş mantığı Deno'dan bağımsız saf TS modüllerinde tutulur ve Vitest ile test edilir.
 - **Neden:** Her katman için en az sürtünmeli araç; Deno kurulumu gerektirmez.
 - **Alternatif:** Her yerde Jest.
+
+## D14 — pnpm tedarik zinciri ayarları
+- **Karar:** pnpm 12'nin `minimumReleaseAge` korumasında yalnızca Expo SDK 58 paketleri için istisna tanımlandı (`pnpm-workspace.yaml`, kurulum sırasında otomatik yazıldı). Build script izni yalnızca `esbuild` için verildi; `@parcel/watcher` reddedildi.
+- **Neden:** `create-expo-app` en güncel SDK yamalarını sabitliyor; bunlar yeni yayımlandığı için varsayılan yaş eşiğine takılıyor.
+- **Alternatif:** Daha eski bir Expo yaması sabitlemek.
+
+## D15 — ESLint 9
+- **Karar:** ESLint 9.x kullanılıyor.
+- **Neden:** `eslint-config-expo` içindeki `eslint-plugin-react`, ESLint 10 ile çalışmıyor.
+- **Alternatif:** Expo yapılandırması güncellenince 10'a geçmek.
+
+## D16 — Bundle kimliği placeholder
+- **Karar:** iOS bundle identifier ve Android package `app.stampa.mobile` (ortam değişkeni `STAMPA_BUNDLE_ID` ile değiştirilebilir).
+- **Neden:** Store kayıtları henüz yok; build alınabilmesi için bir değer gerekli.
+- **Alternatif:** Kendi alan adına göre (ör. `com.<şirket>.stampa`) — store kaydı açılmadan önce karar verilmeli.

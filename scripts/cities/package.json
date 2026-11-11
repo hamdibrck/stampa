@@ -1,0 +1,18 @@
+{
+  "name": "@stampa/cities",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "build": "tsx src/cli.ts all",
+    "download": "tsx src/cli.ts download",
+    "select": "tsx src/cli.ts select",
+    "enrich": "tsx src/cli.ts enrich",
+    "emit": "tsx src/cli.ts emit"
+  },
+  "dependencies": {
+    "@stampa/shared": "workspace:*"
+  }
+}

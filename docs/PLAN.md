@@ -168,15 +168,15 @@ flowchart TD
 
 ### M1 — İskelet
 **Amaç:** Çalışan, test edilebilir boş uygulama ve kalite hattı.
-- [ ] pnpm workspace, ortak tsconfig, ESLint + Prettier
-- [ ] `apps/mobile` Expo uygulaması (Expo Router, dev client)
-- [ ] `packages/shared` (saf TS yardımcılar)
-- [ ] `theme/tokens.ts`, Space Grotesk + Inter fontları
-- [ ] i18n (tr/en, cihaz dili varsayılan)
-- [ ] 4 sekmeli navigasyon (Harita / Listem / Keşfet / Profil)
-- [ ] Jest + RNTL, Vitest; GitHub Actions CI
+- [x] pnpm workspace, ortak tsconfig, ESLint + Prettier
+- [x] `apps/mobile` Expo uygulaması (Expo Router, dev client)
+- [x] `packages/shared` (saf TS yardımcılar)
+- [x] `theme/tokens.ts`, Space Grotesk + Inter fontları
+- [x] i18n (tr/en, cihaz dili varsayılan)
+- [x] 4 sekmeli navigasyon (Harita / Listem / Keşfet / Profil)
+- [x] Jest + RNTL, Vitest; GitHub Actions CI
 
-**Kabul:** `pnpm lint && pnpm typecheck && pnpm test` temiz; uygulama iOS simülatöründe açılıyor.
+**Kabul:** `pnpm lint && pnpm typecheck && pnpm test` temiz; iOS JS bundle derleniyor (`expo export`). Simülatörde açılış, tüm native modüller eklendikten sonra M3'te doğrulanır.
 **Riskler:** pnpm + Metro çözümleme sorunları → `node-linker=hoisted`.
 
 ### M2 — Şehir veri hattı
