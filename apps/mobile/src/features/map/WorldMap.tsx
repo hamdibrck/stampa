@@ -197,8 +197,8 @@ export const WorldMap = forwardRef<WorldMapRef, Props>(function WorldMap({ botto
           ref={citySource}
           data={allCitiesCollection}
           cluster
-          clusterRadius={42}
-          clusterMaxZoom={5}
+          clusterRadius={30}
+          clusterMaxZoom={3}
           onPress={onCityPress}
         >
           <Layer
