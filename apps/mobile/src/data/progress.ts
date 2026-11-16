@@ -73,3 +73,13 @@ export function visitedPolygons(visitedIds: Iterable<number>, lookup = embedded)
   }
   return [...out].sort();
 }
+
+/** Province/state polygons to paint: the regions of the visited cities. */
+export function visitedRegions(visitedIds: Iterable<number>, lookup = embedded): number[] {
+  const out = new Set<number>();
+  for (const id of visitedIds) {
+    const region = lookup.cityById.get(id)?.region;
+    if (region !== undefined && region >= 0) out.add(region);
+  }
+  return [...out].sort((a, b) => a - b);
+}

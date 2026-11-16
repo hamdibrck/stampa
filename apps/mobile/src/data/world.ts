@@ -18,6 +18,8 @@ export type City = {
   isCapital: boolean;
   /** Licence-plate code for Turkish provinces. */
   plate: string | null;
+  /** Index of the city's province/state polygon (regions.geo.json), or -1. */
+  region: number;
 };
 
 export type Country = {
@@ -44,6 +46,7 @@ type CityBundle = {
   lat: number[];
   lon: number[];
   population: number[];
+  region: number[];
   capitals: number[];
   plates: Record<string, string>;
 };
@@ -72,6 +75,7 @@ function inflate(b: CityBundle): City[] {
       population: b.population[i]!,
       isCapital: capitals.has(id),
       plate: b.plates[String(id)] ?? null,
+      region: b.region[i] ?? -1,
     };
   }
   return out;

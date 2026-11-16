@@ -1,6 +1,12 @@
 import { formatFraction, formatPercent } from '@stampa/shared';
 
-import { countryProgress, progressForCountry, visitedPolygons, worldProgress } from './progress';
+import {
+  countryProgress,
+  progressForCountry,
+  visitedPolygons,
+  visitedRegions,
+  worldProgress,
+} from './progress';
 import { createSearchIndex, search } from './search';
 import { cities, citiesByCountry, cityById, countries, countryByIso, totalCities } from './world';
 
@@ -73,6 +79,19 @@ describe('progress', () => {
 
   it('reports every country', () => {
     expect(countryProgress([])).toHaveLength(countries.length);
+  });
+
+  it('gives every Turkish city its own province polygon', () => {
+    const regions = turkey.map((c) => c.region);
+    expect(regions.every((r) => r >= 0)).toBe(true);
+    expect(new Set(regions).size).toBe(81);
+  });
+
+  it('paints only the regions of visited cities', () => {
+    const [a, b] = turkey;
+    expect(visitedRegions([])).toEqual([]);
+    expect(visitedRegions([a!.id])).toEqual([a!.region]);
+    expect(visitedRegions([a!.id, b!.id, -5]).sort()).toEqual([a!.region, b!.region].sort());
   });
 
   it('paints the polygon of each visited country', () => {

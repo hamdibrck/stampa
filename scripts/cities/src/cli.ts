@@ -11,7 +11,7 @@ import {
   mergeCities,
 } from './emit';
 import { enrichCities } from './enrich';
-import { buildCountryGeometry } from './geo';
+import { buildCountryGeometry, buildRegions } from './geo';
 import { parseAdmin1, parseCountryInfo, parseGeoNames } from './geonames';
 import { CACHE, download, REPO, ROOT } from './http';
 import { selectCities } from './select';
@@ -19,6 +19,8 @@ import type { Enrichment, SelectedCity } from './types';
 import { turkishCountryNames } from './wikidata';
 
 const GEONAMES = 'https://download.geonames.org/export/dump';
+const NATURAL_EARTH_ADMIN1 =
+  'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_1_states_provinces.geojson';
 const NATURAL_EARTH =
   'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_admin_0_countries.geojson';
 
@@ -45,6 +47,7 @@ async function stepDownload() {
   await download(`${GEONAMES}/countryInfo.txt`, 'geonames/countryInfo.txt');
   await download(`${GEONAMES}/admin1CodesASCII.txt`, 'geonames/admin1CodesASCII.txt');
   await download(NATURAL_EARTH, 'naturalearth/ne_50m_admin_0_countries.geojson');
+  await download(NATURAL_EARTH_ADMIN1, 'naturalearth/ne_10m_admin_1_states_provinces.geojson');
   console.log('download: ok');
 }
 
@@ -98,7 +101,12 @@ async function stepEmit() {
 
   mkdirSync(APP_DATA, { recursive: true });
   mkdirSync(SEED, { recursive: true });
-  writeJson(join(APP_DATA, 'cities.v1.json'), buildCityBundle(cities));
+  const { regions, regionOf } = await buildRegions(
+    readFileSync(join(CACHE, 'naturalearth', 'ne_10m_admin_1_states_provinces.geojson'), 'utf8'),
+    cities,
+  );
+  writeJson(join(APP_DATA, 'cities.v1.json'), buildCityBundle(cities, regionOf));
+  writeJson(join(APP_DATA, 'regions.geo.json'), regions);
   writeJson(join(APP_DATA, 'countries.v1.json'), buildCountryBundle(countries, cities));
   writeJson(join(APP_DATA, 'countries.geo.json'), geo);
   const sql = buildSeedSql(countries, cities);
@@ -109,6 +117,10 @@ async function stepEmit() {
     cities: cities.length,
     countriesWithCities: countries.filter((c) => c.cityCount > 0).length,
     turkey: cities.filter((c) => c.countryCode === 'TR').length,
+    regions: regions.features.length,
+    citiesWithoutRegion: regionOf.filter((r) => r === -1).length,
+    turkeyRegions: new Set(cities.flatMap((c, i) => (c.countryCode === 'TR' ? [regionOf[i]] : [])))
+      .size,
     capitals: cities.filter((c) => c.isCapital).length,
     withWikidata: [...enrichment.values()].filter((e) => e.qid).length,
     withSummaryTr: cities.filter((c) => c.summaryTr).length,

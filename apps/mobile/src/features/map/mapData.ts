@@ -4,6 +4,9 @@ import { cities, cityById } from '@/data/world';
 
 export const countriesGeo = require('../../../assets/data/countries.geo.json') as FeatureCollection;
 
+/** Province/state polygons; each feature carries its index as `r`. */
+export const regionsGeo = require('../../../assets/data/regions.geo.json') as FeatureCollection;
+
 export type CityProps = { id: number; tr: string; en: string };
 
 function feature(id: number): Feature<Point, CityProps> | null {

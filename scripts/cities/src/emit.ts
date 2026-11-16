@@ -77,7 +77,7 @@ const round = (n: number, digits: number) => Number(n.toFixed(digits));
  * Column-oriented city bundle embedded in the app. Summaries are not included (lazy-loaded).
  * `dataVersion` is a content hash, so identical input always produces an identical file.
  */
-export function buildCityBundle(cities: City[]) {
+export function buildCityBundle(cities: City[], regionOf: number[] = []) {
   const admin1Names = [...new Set(cities.map((c) => c.admin1 ?? ''))].sort();
   const admin1Index = new Map(admin1Names.map((n, i) => [n, i]));
   const body = {
@@ -92,6 +92,8 @@ export function buildCityBundle(cities: City[]) {
     lat: cities.map((c) => round(c.lat, 3)),
     lon: cities.map((c) => round(c.lon, 3)),
     population: cities.map((c) => c.population),
+    /** Index of the city's province/state polygon in regions.geo.json, or -1. */
+    region: cities.map((_, i) => regionOf[i] ?? -1),
     capitals: cities.filter((c) => c.isCapital).map((c) => c.id),
     plates: Object.fromEntries(
       cities.filter((c) => c.plateCode).map((c) => [String(c.id), c.plateCode]),

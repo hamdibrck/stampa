@@ -121,3 +121,9 @@ Format: **Karar / Neden / Alternatif**. Yeni kararlar sona eklenir.
 - **Karar:** GeoNames'te `PPLX` (şehir bölümü/ilçe), `PPLH`, `PPLQ`, `PPLW` türleri şehir sayılmaz. Hiç şehri seçilmeyen ama aday listesinde yeri olan ülkeler için en büyük yerleşim eklenir.
 - **Neden:** Büyük şehirlerin ilçeleri ayrı "şehir" olarak paydayı şişirmesin; her ülkede en az bir damgalanabilir şehir olsun.
 - **Alternatif:** Tüm `P` sınıfı ≥100k yerleşimler (≈ 400 fazladan kayıt).
+
+## D25 — Gezilen şehirler bölge (il/eyalet) sınırıyla boyanır
+- **Karar:** Bir şehir damgalanınca o şehrin birinci düzey idari bölgesi (Türkiye'de il) vurgu rengiyle boyanır; ülkenin tamamı yalnızca bir ton açılır. Sınırlar Natural Earth 10m admin-1 verisinden gelir; yalnızca içinde şehrimiz olan 1.957 bölge pakete girer (`regions.geo.json`, ~0,9 MB). Şehir → bölge eşlemesi veri hattında, sadeleştirilmemiş geometri üzerinde nokta-poligon testiyle yapılır.
+- **Neden:** Kullanıcı isteği: boyama ülke değil şehir bazında olsun. Türkiye'de 81 şehir 81 ile bire bir denk gelir.
+- **Alternatif:** Yalnızca pin rengi (alan hissi yok) ya da ülkenin tamamını boyamak (tek şehirle bütün ülke "gezilmiş" görünür).
+- **Not:** Türkiye dışında bir bölgede birden çok şehir olabilir; herhangi biri gezilince bölge boyanır. 8 şehir hiçbir bölgeyle eşleşmedi, onlarda yalnızca pin renklenir.

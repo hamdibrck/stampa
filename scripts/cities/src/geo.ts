@@ -68,3 +68,89 @@ export function countryAt(geo: CountryCollection, lon: number, lat: number): str
   }
   return null;
 }
+
+// ── First-level regions (provinces/states) ───────────────────────────────────────────────────
+
+export type RegionFeature = { type: 'Feature'; properties: { r: number }; geometry: Geometry };
+export type RegionCollection = { type: 'FeatureCollection'; features: RegionFeature[] };
+
+type RawRegion = { properties: Record<string, unknown>; geometry: Geometry | null };
+type Box = [number, number, number, number];
+
+function polygonsOf(geometry: Geometry): Position[][][] {
+  return geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates;
+}
+
+function boxOf(geometry: Geometry): Box {
+  const box: Box = [Infinity, Infinity, -Infinity, -Infinity];
+  for (const polygon of polygonsOf(geometry)) {
+    for (const [x, y] of polygon[0] ?? []) {
+      if (x < box[0]) box[0] = x;
+      if (y < box[1]) box[1] = y;
+      if (x > box[2]) box[2] = x;
+      if (y > box[3]) box[3] = y;
+    }
+  }
+  return box;
+}
+
+/** Offsets tried when a (usually coastal) city falls just outside every polygon. */
+const NUDGES: [number, number][] = [[0, 0]];
+for (const d of [0.04, 0.1, 0.2]) {
+  NUDGES.push([d, 0], [-d, 0], [0, d], [0, -d], [d, d], [d, -d], [-d, d], [-d, -d]);
+}
+
+/**
+ * Finds the province/state polygon of every point (index into the returned collection, or -1)
+ * and returns only the polygons that are used, simplified for the app. The lookup runs on the
+ * full-resolution geometry so that simplification cannot move a city into a neighbour.
+ */
+export async function buildRegions(
+  naturalEarthAdmin1: string,
+  points: { lon: number; lat: number; countryCode: string }[],
+): Promise<{ regions: RegionCollection; regionOf: number[] }> {
+  const raw = (JSON.parse(naturalEarthAdmin1) as { features: RawRegion[] }).features.filter(
+    (f): f is RawRegion & { geometry: Geometry } => f.geometry !== null,
+  );
+  const boxes = raw.map((f) => boxOf(f.geometry));
+  const countryOf = raw.map((f) => String(f.properties.iso_a2 ?? ''));
+
+  const find = (lon: number, lat: number, country: string, sameCountryOnly: boolean): number => {
+    for (let i = 0; i < raw.length; i++) {
+      if (sameCountryOnly && countryOf[i] !== country) continue;
+      const b = boxes[i]!;
+      if (lon < b[0] || lon > b[2] || lat < b[1] || lat > b[3]) continue;
+      if (polygonsOf(raw[i]!.geometry).some((p) => inPolygon(lon, lat, p))) return i;
+    }
+    return -1;
+  };
+
+  const used = new Map<number, number>(); // raw index → output index
+  const regionOf = points.map((p) => {
+    let hit = -1;
+    for (const [dx, dy] of NUDGES) {
+      // Away from the exact spot, only accept the city's own country.
+      hit = find(p.lon + dx, p.lat + dy, p.countryCode, dx !== 0 || dy !== 0);
+      if (hit !== -1) break;
+    }
+    if (hit === -1) return -1;
+    if (!used.has(hit)) used.set(hit, used.size);
+    return used.get(hit)!;
+  });
+
+  const input = {
+    type: 'FeatureCollection',
+    features: [...used].map(([rawIndex, r]) => ({
+      type: 'Feature',
+      properties: { r },
+      geometry: raw[rawIndex]!.geometry,
+    })),
+  };
+  const out = await mapshaper.applyCommands(
+    '-i in.geojson -simplify 5% keep-shapes -o precision=0.01 format=geojson out.geojson',
+    { 'in.geojson': JSON.stringify(input) },
+  );
+  const regions = JSON.parse(String(out['out.geojson'])) as RegionCollection;
+  regions.features.sort((a, b) => a.properties.r - b.properties.r);
+  return { regions, regionOf };
+}

@@ -14,13 +14,13 @@ import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from 'rea
 import type { NativeSyntheticEvent } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 
-import { visitedPolygons } from '@/data/progress';
+import { visitedPolygons, visitedRegions } from '@/data/progress';
 import { useLocale } from '@/i18n/useLocale';
 import { useMapStore } from '@/store/map';
 import { useVisits, visitedIds } from '@/store/visits';
 import { colors } from '@/theme/tokens';
 
-import { allCitiesCollection, cityCollection, countriesGeo } from './mapData';
+import { allCitiesCollection, cityCollection, countriesGeo, regionsGeo } from './mapData';
 
 const MAPTILER_KEY = process.env.EXPO_PUBLIC_MAPTILER_KEY;
 const MIN_ZOOM = 0.6;
@@ -61,15 +61,11 @@ export const WorldMap = forwardRef<WorldMapRef, Props>(function WorldMap({ botto
   const ids = useMemo(() => visitedIds(visits), [visits]);
   const visitedCollection = useMemo(() => cityCollection(ids), [ids]);
   const visitedCountries = useMemo(() => visitedPolygons(ids), [ids]);
-  // An impossible code keeps the filter valid (and the layers empty) before the first stamp.
-  const visitedCountryFilter = useMemo<FilterSpecification>(
-    () => [
-      'in',
-      ['get', 'iso2'],
-      ['literal', visitedCountries.length > 0 ? visitedCountries : ['--']],
-    ],
-    [visitedCountries],
-  );
+  // An impossible index keeps the filter valid (and the layers empty) before the first stamp.
+  const visitedRegionFilter = useMemo<FilterSpecification>(() => {
+    const regions = visitedRegions(ids);
+    return ['in', ['get', 'r'], ['literal', regions.length > 0 ? regions : [-1]]];
+  }, [ids]);
   // Grey pins are hidden under stamped cities, so the stamp colour is never muddied.
   const unvisitedPinFilter = useMemo<FilterSpecification>(
     () => [
@@ -178,18 +174,21 @@ export const WorldMap = forwardRef<WorldMapRef, Props>(function WorldMap({ botto
             type="line"
             paint={{ 'line-color': colors.mapBorder, 'line-width': 0.7 }}
           />
-          {/* Visited countries: accent tint and outline on top of the lighter land colour. */}
+        </GeoJSONSource>
+
+        {/* City-level colouring: the province/state of every visited city (the il in Türkiye). */}
+        <GeoJSONSource id="regions" data={regionsGeo} tolerance={0.2}>
           <Layer
-            id="country-visited-tint"
+            id="region-visited-fill"
             type="fill"
-            filter={visitedCountryFilter}
-            paint={{ 'fill-color': colors.accent, 'fill-opacity': 0.16 }}
+            filter={visitedRegionFilter}
+            paint={{ 'fill-color': colors.accent, 'fill-opacity': 0.42 }}
           />
           <Layer
-            id="country-visited-line"
+            id="region-visited-line"
             type="line"
-            filter={visitedCountryFilter}
-            paint={{ 'line-color': colors.accent, 'line-width': 1.2, 'line-opacity': 0.75 }}
+            filter={visitedRegionFilter}
+            paint={{ 'line-color': colors.accent, 'line-width': 1 }}
           />
         </GeoJSONSource>
 
