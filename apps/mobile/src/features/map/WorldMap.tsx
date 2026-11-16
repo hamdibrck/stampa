@@ -4,6 +4,7 @@ import {
   Layer,
   Map,
   type CameraRef,
+  type FilterSpecification,
   type GeoJSONSourceRef,
   type PressEventWithFeatures,
   type StyleSpecification,
@@ -60,6 +61,24 @@ export const WorldMap = forwardRef<WorldMapRef, Props>(function WorldMap({ botto
   const ids = useMemo(() => visitedIds(visits), [visits]);
   const visitedCollection = useMemo(() => cityCollection(ids), [ids]);
   const visitedCountries = useMemo(() => visitedPolygons(ids), [ids]);
+  // An impossible code keeps the filter valid (and the layers empty) before the first stamp.
+  const visitedCountryFilter = useMemo<FilterSpecification>(
+    () => [
+      'in',
+      ['get', 'iso2'],
+      ['literal', visitedCountries.length > 0 ? visitedCountries : ['--']],
+    ],
+    [visitedCountries],
+  );
+  // Grey pins are hidden under stamped cities, so the stamp colour is never muddied.
+  const unvisitedPinFilter = useMemo<FilterSpecification>(
+    () => [
+      'all',
+      ['!', ['has', 'point_count']],
+      ['!', ['in', ['get', 'id'], ['literal', ids.length > 0 ? ids : [-1]]]],
+    ],
+    [ids],
+  );
   const selectedCollection = useMemo(
     () => cityCollection(selectedCityId ? [selectedCityId] : []),
     [selectedCityId],
@@ -159,6 +178,19 @@ export const WorldMap = forwardRef<WorldMapRef, Props>(function WorldMap({ botto
             type="line"
             paint={{ 'line-color': colors.mapBorder, 'line-width': 0.7 }}
           />
+          {/* Visited countries: accent tint and outline on top of the lighter land colour. */}
+          <Layer
+            id="country-visited-tint"
+            type="fill"
+            filter={visitedCountryFilter}
+            paint={{ 'fill-color': colors.accent, 'fill-opacity': 0.16 }}
+          />
+          <Layer
+            id="country-visited-line"
+            type="line"
+            filter={visitedCountryFilter}
+            paint={{ 'line-color': colors.accent, 'line-width': 1.2, 'line-opacity': 0.75 }}
+          />
         </GeoJSONSource>
 
         <GeoJSONSource
@@ -212,7 +244,7 @@ export const WorldMap = forwardRef<WorldMapRef, Props>(function WorldMap({ botto
           <Layer
             id="city-pins"
             type="circle"
-            filter={['!', ['has', 'point_count']]}
+            filter={unvisitedPinFilter}
             paint={{
               'circle-color': colors.pinUnvisited,
               'circle-stroke-color': colors.mapOcean,
@@ -246,13 +278,23 @@ export const WorldMap = forwardRef<WorldMapRef, Props>(function WorldMap({ botto
         {/* Visited cities are never clustered, so stamps stay visible at every zoom level. */}
         <GeoJSONSource id="visited-cities" data={visitedCollection} onPress={onCityPress}>
           <Layer
+            id="visited-glow"
+            type="circle"
+            paint={{
+              'circle-color': colors.accent,
+              'circle-opacity': 0.28,
+              'circle-blur': 0.6,
+              'circle-radius': ['interpolate', ['linear'], ['zoom'], 1, 9, 5, 14, 9, 20],
+            }}
+          />
+          <Layer
             id="visited-pins"
             type="circle"
             paint={{
               'circle-color': colors.accent,
-              'circle-stroke-color': colors.bg,
+              'circle-stroke-color': colors.text,
               'circle-stroke-width': 1.5,
-              'circle-radius': ['interpolate', ['linear'], ['zoom'], 1, 3.5, 5, 5, 9, 7],
+              'circle-radius': ['interpolate', ['linear'], ['zoom'], 1, 4.5, 5, 6.5, 9, 9],
             }}
           />
         </GeoJSONSource>
