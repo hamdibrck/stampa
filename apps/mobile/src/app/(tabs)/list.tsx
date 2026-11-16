@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { flagEmoji, formatDate, formatFraction } from '@stampa/shared';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -50,6 +51,18 @@ export default function ListScreen() {
   const visits = useVisits((s) => s.visits);
   const [newestFirst, setNewestFirst] = useState(true);
   const sections = useMemo(() => buildSections(visits, newestFirst), [visits, newestFirst]);
+  // Countries are listed collapsed; a country's cities open like a dropdown.
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const visible = useMemo(
+    () =>
+      sections.map((s) => ({
+        ...s,
+        count: s.data.length,
+        data: expanded[s.country.iso2] ? s.data : [],
+      })),
+    [sections, expanded],
+  );
+  const toggle = (iso2: string) => setExpanded((prev) => ({ ...prev, [iso2]: !prev[iso2] }));
 
   return (
     <Screen>
@@ -80,27 +93,35 @@ export default function ListScreen() {
         </View>
       ) : (
         <SectionList
-          sections={sections}
+          sections={visible}
           keyExtractor={(item) => String(item.city.id)}
           contentContainerStyle={styles.list}
           stickySectionHeadersEnabled={false}
-          renderSectionHeader={({ section }) => (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={countryName(section.country, locale)}
-              onPress={() =>
-                router.push({ pathname: '/country/[iso2]', params: { iso2: section.country.iso2 } })
-              }
-              style={styles.section}
-            >
-              <AppText variant="heading" numberOfLines={1} style={styles.sectionTitle}>
-                {flagEmoji(section.country.iso2)} {countryName(section.country, locale)}
-              </AppText>
-              <AppText variant="number" color="textMuted">
-                {formatFraction(section.data.length, section.country.cityCount)}
-              </AppText>
-            </Pressable>
-          )}
+          renderSectionHeader={({ section }) => {
+            const open = !!expanded[section.country.iso2];
+            return (
+              <Pressable
+                testID={`list-country-${section.country.iso2}`}
+                accessibilityRole="button"
+                accessibilityLabel={countryName(section.country, locale)}
+                accessibilityState={{ expanded: open }}
+                onPress={() => toggle(section.country.iso2)}
+                style={({ pressed }) => [styles.section, pressed && styles.pressed]}
+              >
+                <AppText variant="heading" numberOfLines={1} style={styles.sectionTitle}>
+                  {flagEmoji(section.country.iso2)} {countryName(section.country, locale)}
+                </AppText>
+                <AppText variant="number" color="textMuted">
+                  {formatFraction(section.count, section.country.cityCount)}
+                </AppText>
+                <Ionicons
+                  name={open ? 'chevron-up' : 'chevron-down'}
+                  size={18}
+                  color={colors.textMuted}
+                />
+              </Pressable>
+            );
+          }}
           renderItem={({ item }) => (
             <Pressable
               accessibilityRole="button"
@@ -154,16 +175,18 @@ const styles = StyleSheet.create({
   center: { textAlign: 'center' },
   list: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl },
   section: {
-    minHeight: hitTarget,
+    minHeight: hitTarget + 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
-    marginTop: spacing.lg,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
   sectionTitle: { flex: 1 },
   row: {
     minHeight: hitTarget + 4,
+    paddingLeft: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
