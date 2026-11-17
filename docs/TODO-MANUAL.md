@@ -10,7 +10,7 @@ Hesap, ödeme veya geri alınamaz işlem gerektirdiği için kodda yalnızca `.e
 - [x] Bundle identifier / Android package: `app.stampa.mobile` olarak kalmasına karar verildi (D16). Store kaydı açıldıktan sonra değiştirilemez. `STAMPA_BUNDLE_ID` ortam değişkeni veya `apps/mobile/app.config.ts`.
 
 ## 2. Supabase
-Proje: `stampa` (`nzqvkbhnokudgxgiducj`), bölge **ap-northeast-1 (Tokyo)**.
+Proje: `stampa` (`wjchuvvscphwcqtapfak`), bölge **eu-central-1 (Frankfurt)**. (İlk proje yanlışlıkla Tokyo'da açılmıştı; silinip yeniden kuruldu.)
 
 - [x] Proje oluşturuldu; `apps/mobile/.env` gerçek projeyi gösteriyor (yerel değerler yorum satırında).
 - [x] Migration'lar + ~5.900 şehir seed'i gönderildi (`npx supabase db push --remote --include-seed`).
@@ -18,7 +18,6 @@ Proje: `stampa` (`nzqvkbhnokudgxgiducj`), bölge **ap-northeast-1 (Tokyo)**.
 - [x] Edge Function'lar yayında: `revenuecat-webhook`, `delete-account`, `refresh-entitlements`.
 - [x] `REVENUECAT_WEBHOOK_SECRET` tanımlandı. Değer yerelde `supabase/.env.remote` dosyasında (git'e girmez); RevenueCat webhook ayarında lazım olacak.
 - [ ] `REVENUECAT_SECRET_API_KEY`: RevenueCat projesi açılınca `npx supabase secrets set --remote REVENUECAT_SECRET_API_KEY=<değer>`.
-- [ ] **Bölge kararı:** Tokyo, Türkiye'deki kullanıcılara uzak (her istekte fazladan gecikme). Bölge sonradan değiştirilemez; değiştirmek için yeni proje açıp aynı komutları tekrar çalıştırmak gerekir. Şu an veri olmadığı için maliyeti birkaç dakika.
 - [ ] Auth → URL Configuration: Site URL `stampa://auth/callback`, Redirect URLs'e `stampa://**` ekle.
 - [ ] Auth → Email: magic link şablonunu gözden geçir; üretimde özel SMTP tanımla (varsayılan SMTP saatte birkaç e-postayla sınırlı).
 - [ ] Yayından önce ücretli plana geç (Free planda proje hareketsiz kalınca duraklatılır).
