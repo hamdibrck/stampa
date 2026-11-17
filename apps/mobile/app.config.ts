@@ -11,6 +11,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: 'Stampa',
   slug: 'stampa',
+  owner: 'hamdialper.biricik',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',
@@ -59,6 +60,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
   ],
+  extra: {
+    eas: { projectId: 'a391f657-c694-463f-98f6-6fad9e2ccafa' },
+  },
   experiments: {
     typedRoutes: true,
     reactCompiler: true,
