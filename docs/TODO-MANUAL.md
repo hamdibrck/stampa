@@ -7,17 +7,21 @@ Hesap, ödeme veya geri alınamaz işlem gerektirdiği için kodda yalnızca `.e
 - [x] `git push -u origin main` — yapıldı; GitHub Actions CI yeşil. Repo şu an **herkese açık**; istemiyorsan GitHub → Settings → Danger Zone'dan private yap.
 
 ## 1. Uygulama kimliği (store kaydından ÖNCE karar ver)
-- [ ] Bundle identifier / Android package: şu an `app.stampa.mobile` (D16). Store kaydı açıldıktan sonra değiştirilemez. `STAMPA_BUNDLE_ID` ortam değişkeni veya `apps/mobile/app.config.ts`.
+- [x] Bundle identifier / Android package: `app.stampa.mobile` olarak kalmasına karar verildi (D16). Store kaydı açıldıktan sonra değiştirilemez. `STAMPA_BUNDLE_ID` ortam değişkeni veya `apps/mobile/app.config.ts`.
 
 ## 2. Supabase
-- [ ] Proje oluştur. `apps/mobile/.env` içine `EXPO_PUBLIC_SUPABASE_URL` ve `EXPO_PUBLIC_SUPABASE_ANON_KEY` yaz (şu an yerel geliştirme değerleri var).
-- [ ] `npx supabase link --project-ref <ref>` ardından `npx supabase db push --include-seed` (migration'lar + ~5.900 şehir seed'i).
-- [ ] `pg_cron`: migration `create extension pg_cron` çalıştırır; hata verirse Dashboard → Database → Extensions'tan etkinleştirip `db push`'u tekrarla. Kontrol: `select * from cron.job;` içinde `refresh-community-stats` görünmeli.
-- [ ] Edge Function'ları yayınla: `npx supabase functions deploy revenuecat-webhook delete-account refresh-entitlements`.
-- [ ] Function secret'ları: `npx supabase secrets set REVENUECAT_WEBHOOK_SECRET=<rastgele uzun değer> REVENUECAT_SECRET_API_KEY=<RevenueCat secret key>`.
+Proje: `stampa` (`nzqvkbhnokudgxgiducj`), bölge **ap-northeast-1 (Tokyo)**.
+
+- [x] Proje oluşturuldu; `apps/mobile/.env` gerçek projeyi gösteriyor (yerel değerler yorum satırında).
+- [x] Migration'lar + ~5.900 şehir seed'i gönderildi (`npx supabase db push --remote --include-seed`).
+- [x] `pg_cron`: `refresh-community-stats` görevi `*/15 * * * *` ile aktif.
+- [x] Edge Function'lar yayında: `revenuecat-webhook`, `delete-account`, `refresh-entitlements`.
+- [x] `REVENUECAT_WEBHOOK_SECRET` tanımlandı. Değer yerelde `supabase/.env.remote` dosyasında (git'e girmez); RevenueCat webhook ayarında lazım olacak.
+- [ ] `REVENUECAT_SECRET_API_KEY`: RevenueCat projesi açılınca `npx supabase secrets set --remote REVENUECAT_SECRET_API_KEY=<değer>`.
+- [ ] **Bölge kararı:** Tokyo, Türkiye'deki kullanıcılara uzak (her istekte fazladan gecikme). Bölge sonradan değiştirilemez; değiştirmek için yeni proje açıp aynı komutları tekrar çalıştırmak gerekir. Şu an veri olmadığı için maliyeti birkaç dakika.
 - [ ] Auth → URL Configuration: Site URL `stampa://auth/callback`, Redirect URLs'e `stampa://**` ekle.
 - [ ] Auth → Email: magic link şablonunu gözden geçir; üretimde özel SMTP tanımla (varsayılan SMTP saatte birkaç e-postayla sınırlı).
-- [ ] Storage: `photos` bucket'ı migration ile özel (private) oluşturulur; Dashboard'da doğrula.
+- [ ] Yayından önce ücretli plana geç (Free planda proje hareketsiz kalınca duraklatılır).
 
 ## 3. Apple
 - [ ] Apple Developer Program üyeliği; App ID (bundle id) oluştur, "Sign in with Apple" yeteneğini aç.
