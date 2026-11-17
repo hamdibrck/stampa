@@ -280,7 +280,7 @@ flowchart TD
 - [ ] Sandbox'ta Şehir paketi ve Plus alınabiliyor, geri yüklenebiliyor. — *Webhook → entitlement → kota zinciri pgTAP ve e2e ile doğrulandı; mağaza sandbox satın alması RevenueCat/App Store/Play hesapları gerektiriyor.*
 - [x] Topluluk yüzdesi gerçek veriden; k-anonimlik eşiğine uyuyor. — *pgTAP (20 ziyaretçi gösterilir, 19 gizlenir; ham sayılar API'ye kapalı).*
 - [x] Hesap silme tüm veriyi ve fotoğrafları kaldırıyor. — *Yerel stack üzerinde `delete-account` Edge Function'ı ile e2e.*
-- [ ] `pnpm lint && pnpm typecheck && pnpm test` temiz; CI yeşil. — *Yerelde temiz (124 birim testi + 97 pgTAP + 20 e2e). CI, push yapılmadığı için hiç çalışmadı.*
+- [x] `pnpm lint && pnpm typecheck && pnpm test` temiz; CI yeşil. — *Yerelde temiz; GitHub Actions `b1d09d6` commit'inde başarılı (lint, typecheck, testler ve pgTAP).*
 - [ ] iOS ve Android için EAS development build. — *iOS simülatör build'i yerelde `xcodebuild` ile alındı ve uygulama açıldı. EAS build (hesap) ve Android (bu makinede JDK/SDK yok) denenmedi.*
 
 ## 6. Bilinen sınırlar

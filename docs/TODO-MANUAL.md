@@ -4,7 +4,7 @@ Hesap, ödeme veya geri alınamaz işlem gerektirdiği için kodda yalnızca `.e
 
 ## 0. Repo
 - [ ] `stampa/stampa/` klasörü: içinde boş bir git deposu olan başıboş klasör. Dokunulmadı, `.gitignore`'a eklendi. Gerekmiyorsa sil.
-- [ ] `git push -u origin main` — commit'ler yalnızca yerelde atıldı. Push'tan sonra GitHub Actions CI'ın yeşil olduğunu kontrol et (CI hiç çalıştırılmadı).
+- [x] `git push -u origin main` — yapıldı; GitHub Actions CI yeşil. Repo şu an **herkese açık**; istemiyorsan GitHub → Settings → Danger Zone'dan private yap.
 
 ## 1. Uygulama kimliği (store kaydından ÖNCE karar ver)
 - [ ] Bundle identifier / Android package: şu an `app.stampa.mobile` (D16). Store kaydı açıldıktan sonra değiştirilemez. `STAMPA_BUNDLE_ID` ortam değişkeni veya `apps/mobile/app.config.ts`.
